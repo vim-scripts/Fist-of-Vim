@@ -1,6 +1,6 @@
 " Fist of Vim - For super simple and fast gisting from Vim
 " Maintainer:  Akshay Hegde <http://github.com/ajh17>
-" Version:     1.2
+" Version:     1.3
 " Website:     <http://github.com/ajh17/vim-fist>
 
 " Vimscript Setup: {{{1
@@ -42,7 +42,7 @@ function! Fist(type, update, ...)
     if g:fist_anonymously
         let s:fist_command .= "a"
         silent execute "!gist -Pc" . s:fist_command . " -f " . bufname("%")
-    elseif
+    else
         silent execute "!gist -Pc" . s:fist_command . a:update . " -f " . bufname("%")
     endif
     redraw!
@@ -58,7 +58,20 @@ function! FistUpdate(type)
 endfunction
 
 " Maps: {{{1
-nnoremap <silent> <leader>p :set opfunc=FistNew<CR>g@
-xnoremap <silent> <leader>p :<C-u>call Fist(visualmode(), "", 1)<CR>
-nnoremap <silent> <leader>u :set opfunc=FistUpdate<CR>g@
-xnoremap <silent> <leader>u :<C-u>call Fist(visualmode(), " -u " . @f, 1)<CR>
+nnoremap <silent> <plug>fov_new           :set opfunc=FistNew<CR>g@
+nnoremap <silent> <plug>fov_update        :set opfunc=FistUpdate<CR>g@
+xnoremap <silent> <plug>fov_visual_new    :<C-u>call Fist(visualmode(), "", 1)<CR>
+xnoremap <silent> <plug>fov_visual_update :<C-u>call Fist(visualmode(), " - u " . @f, 1)<CR>
+
+if !hasmapto('<plug>fov_new')
+    nmap <unique><silent> <leader>p <plug>fov_new
+endif
+if !hasmapto('<plug>fov_update')
+    nmap <unique><silent> <leader>u <plug>fov_update
+endif
+if !hasmapto('<plug>fov_visual_new')
+    xmap <unique><silent> <leader>p <plug>fov_visual_new
+endif
+if !hasmapto('<plug>fov_visual_update')
+    xmap <unique><silent> <leader>u <plug>fov_visual_update
+endif

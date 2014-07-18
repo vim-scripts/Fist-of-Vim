@@ -6,11 +6,6 @@ Fast, simple and super awesome Gist-ing for Vim.
 
 For the latest version of this plugin, go to: https://github.com/ajh17/vim-fist
 
-## Dependencies
-
-Gist command line tool
-
-
 ## Setup
 
 First, you want to make sure you have the gist command line setup and happy:
@@ -19,8 +14,3 @@ First, you want to make sure you have the gist command line setup and happy:
     gist --login
 
 And you're done! Why are you still reading this? Go fist!
-
-## License
-
-Copyright (c) Akshay Hegde. Distributed under the same terms as Vim itself. See
-`:help license`
