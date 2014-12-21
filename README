@@ -6,11 +6,27 @@ Fast, simple and super awesome Gist-ing for Vim.
 
 For the latest version of this plugin, go to: https://github.com/ajh17/vim-fist
 
-## Setup
+Setup
+====
 
-First, you want to make sure you have the gist command line setup and happy:
+Fist of Vim depends on the gist command line tool. You can install and configure it by running:
 
     [sudo] gem install gist
     gist --login
 
-And you're done! Why are you still reading this? Go fist!
+Usage
+=====
+
+Fist of Vim defines these mappings:
+
+<leader>p - Create a new gist
+
+<leader>u - Update an existing gist
+
+<leader>l - List your gists
+
+Fist of Vim also sets the filetype and syntax completely automatically without you having to set it! Impressive, huh?
+
+You can use Fist of Vim with a visual selection, or in normal mode, in which case, it is motion based.
+
+For example, in normal mode, <leader>pG will create a new gist from the cursor to the end of file. In visual mode, simply visually select what you want gisted and then hit <leader>p to create a new gist.

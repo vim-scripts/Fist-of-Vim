@@ -1,6 +1,6 @@
-" Fist of Vim - For super simple and fast gisting from Vim
+" Fist of Vim - Super simple and fast gisting for Vim
 " Maintainer:  Akshay Hegde <http://github.com/ajh17>
-" Version:     1.4
+" Version:     1.5
 " Website:     <http://github.com/ajh17/vim-fist>
 
 " Vimscript Setup: {{{1
@@ -27,13 +27,13 @@ if !exists('g:fist_no_maps')
 endif
 
 " Functions: {{{1
-function! Fist(type, update, ...)
-  if a:0
+function! s:fist(type, update, ...)
+  if a:0                             " Invoked from visual mode
     silent exe "normal! gvy"
-  elseif a:type == 'line'
-    silent exe "normal! `[V`]Y"
-  else
-    silent exe "normal! `[v`]Y"
+  elseif a:type ==# "char"           " Invoked from a characterwise motion
+    silent exe "normal! `[v`]y"
+  else                               " Invoked from a linewise motion
+    silent exe "normal! '[V']y"
   endif
 
   let s:fist_command = ""
@@ -47,21 +47,22 @@ function! Fist(type, update, ...)
     let s:fist_command .= "a"
     silent execute "!gist -Pc" . s:fist_command . " -f " . bufname("%")
   else
-    silent execute "!gist -Pc" . s:fist_command . a:update . " -f " . bufname("%")
+    silent execute "!gist -Pc" . s:fist_command . a:update
   endif
+
   redraw!
   let @f = @*
 endfunction
 
-function! FistNew(type)
-  call Fist(1, "")
+function! s:fistnew(type)
+  call s:fist(a:type, "")
 endfunction
 
-function! FistUpdate(type)
-  call Fist(visualmode(), " -u " . @f, 1)
+function! s:fistupdate(type)
+  call s:fist(a:type, "u" . @f)
 endfunction
 
-function! FistList()
+function! s:fistlist()
   copen
   return system("gist -l")
 endfunction
@@ -70,12 +71,12 @@ endfunction
 if exists(":Dispatch")
   nnoremap <silent> <plug>fov_list          :Dispatch gist -l<CR>
 else
-  nnoremap <silent> <plug>fov_list          :cexpr FistList()<CR>
+  nnoremap <silent> <plug>fov_list          :cexpr <SID>fistlist()<CR>
 endif
-nnoremap <silent> <plug>fov_new           :set opfunc=FistNew<CR>g@
-nnoremap <silent> <plug>fov_update        :set opfunc=FistUpdate<CR>g@
-xnoremap <silent> <plug>fov_visual_new    :<C-u>call Fist(visualmode(), "", 1)<CR>
-xnoremap <silent> <plug>fov_visual_update :<C-u>call Fist(visualmode(), " - u " . @f, 1)<CR>
+nnoremap <silent> <plug>fov_new           :<C-u>set opfunc=<SID>fistnew<CR>g@
+nnoremap <silent> <plug>fov_update        :<C-u>set opfunc=<SID>fistupdate<CR>g@
+xnoremap <silent> <plug>fov_visual_new    :<C-u>call <SID>fist(visualmode(), "", 1)<CR>
+xnoremap <silent> <plug>fov_visual_update :<C-u>call <SID>fist(visualmode(), "u" . @f, 1)<CR>
 
 if !g:fist_no_maps
   if !hasmapto('<plug>fov_list')
