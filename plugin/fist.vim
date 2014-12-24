@@ -1,6 +1,6 @@
 " Fist of Vim - Super simple and fast gisting for Vim
 " Maintainer:  Akshay Hegde <http://github.com/ajh17>
-" Version:     1.5
+" Version:     1.6
 " Website:     <http://github.com/ajh17/vim-fist>
 
 " Vimscript Setup: {{{1
@@ -26,6 +26,10 @@ if !exists('g:fist_no_maps')
   let g:fist_no_maps = 0
 endif
 
+if !exists('g:fist_dispatch')
+  let g:fist_dispatch = 0
+endif
+
 " Functions: {{{1
 function! s:fist(type, update, ...)
   if a:0                             " Invoked from visual mode
@@ -45,9 +49,9 @@ function! s:fist(type, update, ...)
   endif
   if g:fist_anonymously
     let s:fist_command .= "a"
-    silent execute "!gist -Pc" . s:fist_command . " -f " . bufname("%")
+    silent execute "!gist -Pc" . s:fist_command . "f " . bufname("%")
   else
-    silent execute "!gist -Pc" . s:fist_command . a:update
+    silent execute "!gist -Pc" . s:fist_command . a:update . "f " . bufname("%")
   endif
 
   redraw!
@@ -63,35 +67,33 @@ function! s:fistupdate(type)
 endfunction
 
 function! s:fistlist()
-  copen
-  return system("gist -l")
+  let gists = system("gist -l")
+  let list = []
+  for line in split(gists, '\n')
+    if line =~# ':'
+      call add(list, {'text': matchstr(line, ' \zs.*'), 'filename': matchstr(line, 'http\S\+')})
+    endif
+  endfor
+  return list
 endfunction
 
 " Maps: {{{1
-if exists(":Dispatch")
-  nnoremap <silent> <plug>fov_list          :Dispatch gist -l<CR>
-else
-  nnoremap <silent> <plug>fov_list          :cexpr <SID>fistlist()<CR>
-endif
 nnoremap <silent> <plug>fov_new           :<C-u>set opfunc=<SID>fistnew<CR>g@
 nnoremap <silent> <plug>fov_update        :<C-u>set opfunc=<SID>fistupdate<CR>g@
 xnoremap <silent> <plug>fov_visual_new    :<C-u>call <SID>fist(visualmode(), "", 1)<CR>
 xnoremap <silent> <plug>fov_visual_update :<C-u>call <SID>fist(visualmode(), "u" . @f, 1)<CR>
+if g:fist_dispatch && exists(":Dispatch")
+  nnoremap <silent> <plug>fov_list          :Dispatch gist -l<CR>
+else
+  nnoremap <silent> <plug>fov_list          :call setqflist(<SID>fistlist()) <bar> copen<CR>
+endif
 
 if !g:fist_no_maps
-  if !hasmapto('<plug>fov_list')
-    nmap <unique><silent> <leader>l <plug>fov_list
-  endif
-  if !hasmapto('<plug>fov_new')
-    nmap <unique><silent> <leader>p <plug>fov_new
-  endif
-  if !hasmapto('<plug>fov_update')
-    nmap <unique><silent> <leader>u <plug>fov_update
-  endif
-  if !hasmapto('<plug>fov_visual_new')
-    xmap <unique><silent> <leader>p <plug>fov_visual_new
-  endif
-  if !hasmapto('<plug>fov_visual_update')
-    xmap <unique><silent> <leader>u <plug>fov_visual_update
+  nmap <leader>p <plug>fov_new
+  xmap <leader>p <plug>fov_visual_new
+  nmap <leader>u <plug>fov_update
+  xmap <leader>u <plug>fov_visual_update
+  if filereadable($HOME."/.gist")
+      nmap <leader>l <plug>fov_list
   endif
 endif
