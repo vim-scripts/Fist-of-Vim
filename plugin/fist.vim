@@ -1,6 +1,6 @@
 " Fist of Vim - Super simple and fast gisting for Vim
 " Maintainer:  Akshay Hegde <http://github.com/ajh17>
-" Version:     1.6
+" Version:     1.7
 " Website:     <http://github.com/ajh17/vim-fist>
 
 " Vimscript Setup: {{{1
@@ -33,11 +33,11 @@ endif
 " Functions: {{{1
 function! s:fist(type, update, ...)
   if a:0                             " Invoked from visual mode
-    silent exe "normal! gvy"
+    silent execute 'normal! gvy'
   elseif a:type ==# "char"           " Invoked from a characterwise motion
-    silent exe "normal! `[v`]y"
+    silent execute "normal! `[v`]y"
   else                               " Invoked from a linewise motion
-    silent exe "normal! '[V']y"
+    silent execute "normal! '[V']y"
   endif
 
   let s:fist_command = ""
@@ -51,7 +51,7 @@ function! s:fist(type, update, ...)
     let s:fist_command .= "a"
     silent execute "!gist -Pc" . s:fist_command . "f " . bufname("%")
   else
-    silent execute "!gist -Pc" . s:fist_command . a:update . "f " . bufname("%")
+    silent execute "!gist -Pc" . s:fist_command . "f " . bufname("%") . a:update
   endif
 
   redraw!
@@ -63,7 +63,7 @@ function! s:fistnew(type)
 endfunction
 
 function! s:fistupdate(type)
-  call s:fist(a:type, "u" . @f)
+  call s:fist(a:type, ' -u ' . @f)
 endfunction
 
 function! s:fistlist()
@@ -81,7 +81,7 @@ endfunction
 nnoremap <silent> <plug>fov_new           :<C-u>set opfunc=<SID>fistnew<CR>g@
 nnoremap <silent> <plug>fov_update        :<C-u>set opfunc=<SID>fistupdate<CR>g@
 xnoremap <silent> <plug>fov_visual_new    :<C-u>call <SID>fist(visualmode(), "", 1)<CR>
-xnoremap <silent> <plug>fov_visual_update :<C-u>call <SID>fist(visualmode(), "u" . @f, 1)<CR>
+xnoremap <silent> <plug>fov_visual_update :<C-u>call <SID>fist(visualmode(), ' -u ' . @f, 1)<CR>
 if g:fist_dispatch && exists(":Dispatch")
   nnoremap <silent> <plug>fov_list          :Dispatch gist -l<CR>
 else
